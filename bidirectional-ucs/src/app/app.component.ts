@@ -7,7 +7,7 @@ import * as d3 from 'd3';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  private chartData: Array<any>;
+  public chartData: Array<any>;
 
   constructor() {}
 

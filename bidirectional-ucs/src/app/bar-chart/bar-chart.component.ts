@@ -16,6 +16,8 @@ export class BarChartComponent implements OnInit {
   private uStatePaths: Array<any>;
   private ignoreStates: Array<string>;
   private links: Array<any>;
+  private centroids: any = [];
+  private stateMap: any;
 
 
   constructor() {
@@ -127,6 +129,7 @@ export class BarChartComponent implements OnInit {
     this.createChart();
     if (this.data) {
       this.addData();
+      this.addCentroids();
     }
   }
 
@@ -149,10 +152,10 @@ export class BarChartComponent implements OnInit {
 
   addData() {
     let sampleData = this.data;
-    const update = this.chart.selectAll('.state')
+    this.stateMap = this.chart.selectAll('.state')
       .data(this.uStatePaths);
 
-    update
+    this.stateMap
       .enter()
       .append("path")
       .attr("class", "state")
@@ -162,5 +165,35 @@ export class BarChartComponent implements OnInit {
       .style("fill", function(d){
         return sampleData[d.id].color
       });
+  }
+
+  addCentroids() {
+    this.calculateCentroids();
+    this.renderCentroids();
+  }
+
+  calculateCentroids() {
+    // add circles to svg
+    this.chart.selectAll('.state').nodes().forEach(path => {
+      let stateId = path.__data__.id;
+      let stateName = path.__data__.n;
+      if (this.ignoreStates.indexOf(stateId) < 0) {
+        let bbox = path.getBBox();
+        let coords = [bbox.x + bbox.width/2, bbox.y + bbox.height/2];
+        let centroid = {"name": stateName, "id": stateId, "coords": coords};
+        this.centroids.push(centroid);
+      }
+    });
+  }
+
+  renderCentroids() {
+    this.stateMap.select("circle")
+      .data(this.centroids).enter()
+      .append("circle")
+      .attr("cx", function (d) { return d.coords[0]; })
+      .attr("cy", function (d) { return d.coords[1]; })
+      .attr("r", "8px")
+      .attr("fill", "red")
+      .attr("id", function(d) { return d.id });
   }
 }
