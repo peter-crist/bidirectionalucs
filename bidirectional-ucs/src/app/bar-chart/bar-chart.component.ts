@@ -130,10 +130,11 @@ export class BarChartComponent implements OnInit {
     if (this.data) {
       this.addData();
       this.addCentroids();
+      this.addTooltips();
     }
   }
 
-  createChart() {
+  private createChart() {
     const element = this.chartContainer.nativeElement;
     const svg = d3.select(element).append('svg')
       .attr('width', "2000px")
@@ -146,11 +147,12 @@ export class BarChartComponent implements OnInit {
 
     // Define the div for the tooltip
     this.tooltip = svg.append("div")
-      .attr("class", "tooltip")
-      .style("opacity", 0);
+      .style("position", "absolute")
+      .style("z-index", "10")
+      .style("visibility", "hidden")
   }
 
-  addData() {
+  private addData() {
     let sampleData = this.data;
     this.stateMap = this.chart.selectAll('.state')
       .data(this.uStatePaths);
@@ -167,12 +169,12 @@ export class BarChartComponent implements OnInit {
       });
   }
 
-  addCentroids() {
+  private addCentroids() {
     this.calculateCentroids();
     this.renderCentroids();
   }
 
-  calculateCentroids() {
+  private calculateCentroids() {
     // add circles to svg
     this.chart.selectAll('.state').nodes().forEach(path => {
       let stateId = path.__data__.id;
@@ -186,7 +188,17 @@ export class BarChartComponent implements OnInit {
     });
   }
 
-  renderCentroids() {
+  private renderCentroids() {
+    this.stateMap.select("circle")
+      .data(this.centroids).enter()
+
+      .append("text")
+      .attr("dx", function (d) { return d.coords[0]; })
+      .attr("dy", function (d) { return d.coords[1]-10; })
+      .attr("id", function(d) { return d.id; })
+      .style("display", "none")
+      .text(function(d) { return d.id });
+
     this.stateMap.select("circle")
       .data(this.centroids).enter()
       .append("circle")
@@ -194,6 +206,18 @@ export class BarChartComponent implements OnInit {
       .attr("cy", function (d) { return d.coords[1]; })
       .attr("r", "8px")
       .attr("fill", "red")
-      .attr("id", function(d) { return d.id });
+      .attr("id", function(d) { return d.id })
+      .on("mouseover", (d) => {
+        this.stateMap
+          .data(this.centroids).enter()
+          .select('#'+d.id)
+          .style("display", "block")
+      })
+      .on("mouseout", (d) => {
+        this.stateMap
+          .data(this.centroids).enter()
+          .select('#'+d.id)
+          .style("display", "none")
+      });
   }
 }

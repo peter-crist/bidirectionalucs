@@ -11,3 +11,11 @@
 .d3-chart .axis text {
   fill: #999;
 }
+
+.state:hover {
+  fill-opacity: 0.5;
+}
+
+circle:hover {
+  fill: green;
+}
