@@ -16,6 +16,10 @@
   fill-opacity: 0.5;
 }
 
+circle {
+  z-index: 20;
+}
+
 circle:hover {
   fill: green;
 }

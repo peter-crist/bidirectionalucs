@@ -17,6 +17,7 @@ export class BarChartComponent implements OnInit {
   private ignoreStates: Array<string>;
   private links: Array<any>;
   private centroids: any = [];
+  private centroidCircles: any;
   private stateMap: any;
 
 
@@ -129,8 +130,9 @@ export class BarChartComponent implements OnInit {
     this.createChart();
     if (this.data) {
       this.addData();
-      this.addCentroids();
-      this.addTooltips();
+      this.addCentroidPlaceholder();
+      this.addLines();
+      this.renderCentroids();
     }
   }
 
@@ -169,9 +171,9 @@ export class BarChartComponent implements OnInit {
       });
   }
 
-  private addCentroids() {
+  private addCentroidPlaceholder() {
     this.calculateCentroids();
-    this.renderCentroids();
+    this.renderDummyCentroids();
   }
 
   private calculateCentroids() {
@@ -188,8 +190,19 @@ export class BarChartComponent implements OnInit {
     });
   }
 
+  private renderDummyCentroids() {
+    let centroidCircles = this.stateMap
+      .data(this.centroids).enter()
+      .append("circle")
+      .attr("cx", function (d) { return d.coords[0]; })
+      .attr("cy", function (d) { return d.coords[1]; })
+      .style("display", "none")
+
+    this.centroidCircles = centroidCircles;
+  }
+
   private renderCentroids() {
-    this.stateMap.select("circle")
+    this.stateMap
       .data(this.centroids).enter()
 
       .append("text")
@@ -199,7 +212,7 @@ export class BarChartComponent implements OnInit {
       .style("display", "none")
       .text(function(d) { return d.id });
 
-    this.stateMap.select("circle")
+    let centroidCircles = this.stateMap
       .data(this.centroids).enter()
       .append("circle")
       .attr("cx", function (d) { return d.coords[0]; })
@@ -219,5 +232,38 @@ export class BarChartComponent implements OnInit {
           .select('#'+d.id)
           .style("display", "none")
       });
+
+    this.centroidCircles = centroidCircles;
   }
+
+  private addLines() {
+    let centroidCircles = this.centroidCircles;
+    let lines = this.stateMap.select("line")
+    .data(this.links).enter()
+    .append("line")
+    .attr("x1", function(d) {
+        return centroidCircles.filter(function(e) {
+          return e.id === d.source
+        }).attr("cx")
+    })
+    .attr("x2", function(d) {
+        return centroidCircles.filter(function(e) {
+            return e.id === d.dest
+        }).attr("cx")
+    })
+    .attr("y1", function(d) {
+        return centroidCircles.filter(function(e) {
+            return e.id === d.source
+        }).attr("cy")
+    })
+    .attr("y2", function(d) {
+        return centroidCircles.filter(function(e) {
+            return e.id === d.dest
+        }).attr("cy")
+    })
+    .style("stroke", "black")         // colour the line
+    .style("stroke-width", 3)        // adjust line width
+    .style("stroke-linecap", "butt")  // stroke-linecap type
+    .style("opacity", 0.2)
+  };
 }
