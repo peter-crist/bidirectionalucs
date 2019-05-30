@@ -237,6 +237,7 @@ export class BarChartComponent implements OnInit {
       .attr("r", "8px")
       .attr("fill", "red")
       .attr("id", function(d) { return d.id })
+      .style("cursor", "pointer")
       .on("mouseover", (d) => {
         this.stateMap
           .data(this.centroids).enter()

@@ -1,7 +1,7 @@
 <ng-container *ngIf="endState; else selectEndState">
     <div>
         End State: {{ endState }}
-        <a class="clear" ng-click="searchAll = null">
+        <a style="cursor: pointer">
             <fa-icon (click)="clearEndState()" icon="times"></fa-icon>
         </a>
     </div>
