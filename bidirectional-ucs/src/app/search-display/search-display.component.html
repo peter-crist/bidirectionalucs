@@ -1,0 +1,10 @@
+<app-start-state
+    [startState]="startState"
+    [currentlySelecting]="currentlySelecting"
+    (currentlySelectingChange)="this.currentlySelecting = $event">
+</app-start-state>
+<app-end-state
+    [endState]="endState"
+    [currentlySelecting]="currentlySelecting"
+    (currentlySelectingChange)="this.currentlySelecting = $event">
+</app-end-state>

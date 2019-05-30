@@ -1,0 +1,11 @@
+<ng-container *ngIf="endState; else selectEndState">
+    <div>
+        End State: {{ endState }}
+        <a class="clear" ng-click="searchAll = null">
+            <fa-icon (click)="clearEndState()" icon="times"></fa-icon>
+        </a>
+    </div>
+</ng-container>
+<ng-template #selectEndState>
+    <button (click)="enableSelectEnd()" [disabled]="currentlySelecting === 'start'">Select a End State</button>
+</ng-template>
